@@ -4,7 +4,10 @@ import bcrypt from "bcrypt";
 
 const resolvers: Resolvers = {
   Mutation: {
-    createUser: async (_, { userName, email, password, location }) => {
+    createUser: async (
+      _,
+      { userName, email, password, name, location, githubUserName }
+    ) => {
       try {
         const existingUser = await prisma.user.findFirst({
           where: {
@@ -25,17 +28,20 @@ const resolvers: Resolvers = {
             userName,
             email,
             password: hashPassword,
-            location,
+            ...(name && { name }),
+            ...(location && { location }),
+            ...(githubUserName && { githubUserName }),
           },
         });
         return {
           ok: true,
-          user,
+          id: user.id,
         };
-      } catch (error) {
+      } catch (e) {
+        console.log(e);
         return {
           ok: false,
-          error,
+          error: e.message,
         };
       }
     },

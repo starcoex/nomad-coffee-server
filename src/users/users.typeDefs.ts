@@ -7,12 +7,12 @@ export default gql`
 
   type User {
     id: Int!
-    userName: String
-    email: String
-    name: String!
+    userName: String!
+    email: String!
+    name: String
     location: String
-    password: String
-    avatarURL: String!
-    githubUserName: String!
+    password: String!
+    avatarURL: String
+    githubUserName: String
   }
 `;
