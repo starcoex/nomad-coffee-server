@@ -9,6 +9,7 @@ export default gql`
       location: String
       password: String
       avatarURL: String
+      file: Upload
       githubUserName: String
     ): CommonResponse!
   }

@@ -1,4 +1,5 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
+import { GraphQLUpload } from "graphql-upload-minimal";
 
 const config: CodegenConfig = {
   overwrite: true,
@@ -8,6 +9,9 @@ const config: CodegenConfig = {
       plugins: ["typescript", "typescript-resolvers"],
       config: {
         contextType: "../types/context#DataSourceContext",
+        scalars: {
+          Upload: GraphQLUpload,
+        },
       },
     },
   },

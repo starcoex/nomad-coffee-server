@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo } from 'graphql';
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { DataSourceContext } from '../types/context';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -15,6 +15,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  Upload: { input: "Upload"; output: "Upload"; }
 };
 
 export type CommonResponse = {
@@ -22,6 +23,19 @@ export type CommonResponse = {
   error?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['Int']['output']>;
   ok: Scalars['Boolean']['output'];
+};
+
+export type EditFileUploadResponse = {
+  __typename?: 'EditFileUploadResponse';
+  error?: Maybe<Scalars['String']['output']>;
+  file?: Maybe<File>;
+  ok: Scalars['Boolean']['output'];
+};
+
+export type File = {
+  __typename?: 'File';
+  fileUrl: Scalars['String']['output'];
+  id: Scalars['Int']['output'];
 };
 
 export type LoginUserResponse = {
@@ -34,8 +48,12 @@ export type LoginUserResponse = {
 export type Mutation = {
   __typename?: 'Mutation';
   createUser: CommonResponse;
+  deleteFileUpload: CommonResponse;
+  editFileUpload: CommonResponse;
   editUser: CommonResponse;
   loginUser: LoginUserResponse;
+  multipleFileUpload?: Maybe<File>;
+  singleFileUpload: CommonResponse;
 };
 
 
@@ -50,9 +68,21 @@ export type MutationCreateUserArgs = {
 };
 
 
+export type MutationDeleteFileUploadArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
+export type MutationEditFileUploadArgs = {
+  avatarURL?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['Int']['input'];
+};
+
+
 export type MutationEditUserArgs = {
   avatarURL?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
+  file?: InputMaybe<Scalars['Upload']['input']>;
   githubUserName?: InputMaybe<Scalars['String']['input']>;
   location?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -64,6 +94,18 @@ export type MutationEditUserArgs = {
 export type MutationLoginUserArgs = {
   password: Scalars['String']['input'];
   userName: Scalars['String']['input'];
+};
+
+
+export type MutationMultipleFileUploadArgs = {
+  input?: InputMaybe<UploadFile>;
+};
+
+
+export type MutationSingleFileUploadArgs = {
+  avatarURL?: InputMaybe<Scalars['String']['input']>;
+  file?: InputMaybe<Scalars['Upload']['input']>;
+  id: Scalars['Int']['input'];
 };
 
 export type Query = {
@@ -84,10 +126,16 @@ export type SeeUserResponse = {
   user?: Maybe<User>;
 };
 
+export type UploadFile = {
+  file: Scalars['Upload']['input'];
+  id: Scalars['Int']['input'];
+};
+
 export type User = {
   __typename?: 'User';
   avatarURL?: Maybe<Scalars['String']['output']>;
   email: Scalars['String']['output'];
+  file?: Maybe<Scalars['Upload']['output']>;
   githubUserName?: Maybe<Scalars['String']['output']>;
   id: Scalars['Int']['output'];
   location?: Maybe<Scalars['String']['output']>;
@@ -169,12 +217,16 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   CommonResponse: ResolverTypeWrapper<CommonResponse>;
+  EditFileUploadResponse: ResolverTypeWrapper<EditFileUploadResponse>;
+  File: ResolverTypeWrapper<File>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   LoginUserResponse: ResolverTypeWrapper<LoginUserResponse>;
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
   SeeUserResponse: ResolverTypeWrapper<SeeUserResponse>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  Upload: ResolverTypeWrapper<Scalars['Upload']['output']>;
+  UploadFile: UploadFile;
   User: ResolverTypeWrapper<User>;
 };
 
@@ -182,12 +234,16 @@ export type ResolversTypes = {
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
   CommonResponse: CommonResponse;
+  EditFileUploadResponse: EditFileUploadResponse;
+  File: File;
   Int: Scalars['Int']['output'];
   LoginUserResponse: LoginUserResponse;
   Mutation: {};
   Query: {};
   SeeUserResponse: SeeUserResponse;
   String: Scalars['String']['output'];
+  Upload: Scalars['Upload']['output'];
+  UploadFile: UploadFile;
   User: User;
 };
 
@@ -195,6 +251,19 @@ export type CommonResponseResolvers<ContextType = DataSourceContext, ParentType 
   error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type EditFileUploadResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['EditFileUploadResponse'] = ResolversParentTypes['EditFileUploadResponse']> = {
+  error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  file?: Resolver<Maybe<ResolversTypes['File']>, ParentType, ContextType>;
+  ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type FileResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['File'] = ResolversParentTypes['File']> = {
+  fileUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -207,8 +276,12 @@ export type LoginUserResponseResolvers<ContextType = DataSourceContext, ParentTy
 
 export type MutationResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   createUser?: Resolver<ResolversTypes['CommonResponse'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'email' | 'name' | 'password' | 'userName'>>;
+  deleteFileUpload?: Resolver<ResolversTypes['CommonResponse'], ParentType, ContextType, RequireFields<MutationDeleteFileUploadArgs, 'id'>>;
+  editFileUpload?: Resolver<ResolversTypes['CommonResponse'], ParentType, ContextType, RequireFields<MutationEditFileUploadArgs, 'id'>>;
   editUser?: Resolver<ResolversTypes['CommonResponse'], ParentType, ContextType, Partial<MutationEditUserArgs>>;
   loginUser?: Resolver<ResolversTypes['LoginUserResponse'], ParentType, ContextType, RequireFields<MutationLoginUserArgs, 'password' | 'userName'>>;
+  multipleFileUpload?: Resolver<Maybe<ResolversTypes['File']>, ParentType, ContextType, Partial<MutationMultipleFileUploadArgs>>;
+  singleFileUpload?: Resolver<ResolversTypes['CommonResponse'], ParentType, ContextType, RequireFields<MutationSingleFileUploadArgs, 'id'>>;
 };
 
 export type QueryResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
@@ -223,9 +296,14 @@ export type SeeUserResponseResolvers<ContextType = DataSourceContext, ParentType
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export interface UploadScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Upload'], any> {
+  name: 'Upload';
+}
+
 export type UserResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   avatarURL?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  file?: Resolver<Maybe<ResolversTypes['Upload']>, ParentType, ContextType>;
   githubUserName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   location?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -237,10 +315,13 @@ export type UserResolvers<ContextType = DataSourceContext, ParentType extends Re
 
 export type Resolvers<ContextType = DataSourceContext> = {
   CommonResponse?: CommonResponseResolvers<ContextType>;
+  EditFileUploadResponse?: EditFileUploadResponseResolvers<ContextType>;
+  File?: FileResolvers<ContextType>;
   LoginUserResponse?: LoginUserResponseResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   SeeUserResponse?: SeeUserResponseResolvers<ContextType>;
+  Upload?: GraphQLScalarType;
   User?: UserResolvers<ContextType>;
 };
 
