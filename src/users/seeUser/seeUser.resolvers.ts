@@ -3,9 +3,17 @@ import prisma from "../../prisma/client";
 
 const resolvers: Resolvers = {
   Query: {
-    seeUser: async (_, { userName }) => {
+    seeUser: async (_, { page, userName }) => {
       try {
-        const user = await prisma.user.findUnique({ where: { userName } });
+        const user = await prisma.user.findMany({
+          where: { userName },
+          include: {
+            followers: true,
+            following: true,
+          },
+          take: 25,
+          skip: (page - 1) * 25,
+        });
         return {
           ok: true,
           user,

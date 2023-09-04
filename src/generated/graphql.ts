@@ -38,6 +38,13 @@ export type File = {
   id: Scalars['Int']['output'];
 };
 
+export type FollowerUserResponse = {
+  __typename?: 'FollowerUserResponse';
+  error?: Maybe<Scalars['String']['output']>;
+  ok: Scalars['Boolean']['output'];
+  token?: Maybe<Scalars['String']['output']>;
+};
+
 export type LoginUserResponse = {
   __typename?: 'LoginUserResponse';
   error?: Maybe<Scalars['String']['output']>;
@@ -51,9 +58,11 @@ export type Mutation = {
   deleteFileUpload: CommonResponse;
   editFileUpload: CommonResponse;
   editUser: CommonResponse;
+  followerUser?: Maybe<FollowerUserResponse>;
   loginUser: LoginUserResponse;
   multipleFileUpload?: Maybe<File>;
   singleFileUpload: CommonResponse;
+  unFollowerUser?: Maybe<UnFollowerUserResponse>;
 };
 
 
@@ -91,6 +100,11 @@ export type MutationEditUserArgs = {
 };
 
 
+export type MutationFollowerUserArgs = {
+  userName?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type MutationLoginUserArgs = {
   password: Scalars['String']['input'];
   userName: Scalars['String']['input'];
@@ -108,22 +122,49 @@ export type MutationSingleFileUploadArgs = {
   id: Scalars['Int']['input'];
 };
 
+
+export type MutationUnFollowerUserArgs = {
+  userName?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Query = {
   __typename?: 'Query';
+  searchUser: SearchUserResponse;
   seeUser?: Maybe<SeeUserResponse>;
   users?: Maybe<Array<Maybe<User>>>;
 };
 
 
+export type QuerySearchUserArgs = {
+  keyword: Scalars['String']['input'];
+  page?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type QuerySeeUserArgs = {
+  page: Scalars['Int']['input'];
   userName: Scalars['String']['input'];
+};
+
+export type SearchUserResponse = {
+  __typename?: 'SearchUserResponse';
+  error?: Maybe<Scalars['String']['output']>;
+  ok: Scalars['Boolean']['output'];
+  user?: Maybe<Array<Maybe<User>>>;
 };
 
 export type SeeUserResponse = {
   __typename?: 'SeeUserResponse';
   error?: Maybe<Scalars['String']['output']>;
   ok: Scalars['Boolean']['output'];
-  user?: Maybe<User>;
+  user?: Maybe<Array<Maybe<User>>>;
+};
+
+export type UnFollowerUserResponse = {
+  __typename?: 'UnFollowerUserResponse';
+  error?: Maybe<Scalars['String']['output']>;
+  ok: Scalars['Boolean']['output'];
+  token?: Maybe<Scalars['String']['output']>;
 };
 
 export type UploadFile = {
@@ -136,11 +177,17 @@ export type User = {
   avatarURL?: Maybe<Scalars['String']['output']>;
   email: Scalars['String']['output'];
   file?: Maybe<Scalars['Upload']['output']>;
+  followers?: Maybe<Array<Maybe<User>>>;
+  following?: Maybe<Array<Maybe<User>>>;
   githubUserName?: Maybe<Scalars['String']['output']>;
   id: Scalars['Int']['output'];
+  isFollowing?: Maybe<Scalars['Boolean']['output']>;
+  isMe?: Maybe<Scalars['Boolean']['output']>;
   location?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   password: Scalars['String']['output'];
+  totalFollowers?: Maybe<Scalars['Int']['output']>;
+  totalFollowing?: Maybe<Scalars['Int']['output']>;
   userName: Scalars['String']['output'];
 };
 
@@ -219,12 +266,15 @@ export type ResolversTypes = {
   CommonResponse: ResolverTypeWrapper<CommonResponse>;
   EditFileUploadResponse: ResolverTypeWrapper<EditFileUploadResponse>;
   File: ResolverTypeWrapper<File>;
+  FollowerUserResponse: ResolverTypeWrapper<FollowerUserResponse>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   LoginUserResponse: ResolverTypeWrapper<LoginUserResponse>;
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
+  SearchUserResponse: ResolverTypeWrapper<SearchUserResponse>;
   SeeUserResponse: ResolverTypeWrapper<SeeUserResponse>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  UnFollowerUserResponse: ResolverTypeWrapper<UnFollowerUserResponse>;
   Upload: ResolverTypeWrapper<Scalars['Upload']['output']>;
   UploadFile: UploadFile;
   User: ResolverTypeWrapper<User>;
@@ -236,12 +286,15 @@ export type ResolversParentTypes = {
   CommonResponse: CommonResponse;
   EditFileUploadResponse: EditFileUploadResponse;
   File: File;
+  FollowerUserResponse: FollowerUserResponse;
   Int: Scalars['Int']['output'];
   LoginUserResponse: LoginUserResponse;
   Mutation: {};
   Query: {};
+  SearchUserResponse: SearchUserResponse;
   SeeUserResponse: SeeUserResponse;
   String: Scalars['String']['output'];
+  UnFollowerUserResponse: UnFollowerUserResponse;
   Upload: Scalars['Upload']['output'];
   UploadFile: UploadFile;
   User: User;
@@ -267,6 +320,13 @@ export type FileResolvers<ContextType = DataSourceContext, ParentType extends Re
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type FollowerUserResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['FollowerUserResponse'] = ResolversParentTypes['FollowerUserResponse']> = {
+  error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  token?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type LoginUserResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['LoginUserResponse'] = ResolversParentTypes['LoginUserResponse']> = {
   error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
@@ -279,20 +339,37 @@ export type MutationResolvers<ContextType = DataSourceContext, ParentType extend
   deleteFileUpload?: Resolver<ResolversTypes['CommonResponse'], ParentType, ContextType, RequireFields<MutationDeleteFileUploadArgs, 'id'>>;
   editFileUpload?: Resolver<ResolversTypes['CommonResponse'], ParentType, ContextType, RequireFields<MutationEditFileUploadArgs, 'id'>>;
   editUser?: Resolver<ResolversTypes['CommonResponse'], ParentType, ContextType, Partial<MutationEditUserArgs>>;
+  followerUser?: Resolver<Maybe<ResolversTypes['FollowerUserResponse']>, ParentType, ContextType, Partial<MutationFollowerUserArgs>>;
   loginUser?: Resolver<ResolversTypes['LoginUserResponse'], ParentType, ContextType, RequireFields<MutationLoginUserArgs, 'password' | 'userName'>>;
   multipleFileUpload?: Resolver<Maybe<ResolversTypes['File']>, ParentType, ContextType, Partial<MutationMultipleFileUploadArgs>>;
   singleFileUpload?: Resolver<ResolversTypes['CommonResponse'], ParentType, ContextType, RequireFields<MutationSingleFileUploadArgs, 'id'>>;
+  unFollowerUser?: Resolver<Maybe<ResolversTypes['UnFollowerUserResponse']>, ParentType, ContextType, Partial<MutationUnFollowerUserArgs>>;
 };
 
 export type QueryResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  seeUser?: Resolver<Maybe<ResolversTypes['SeeUserResponse']>, ParentType, ContextType, RequireFields<QuerySeeUserArgs, 'userName'>>;
+  searchUser?: Resolver<ResolversTypes['SearchUserResponse'], ParentType, ContextType, RequireFields<QuerySearchUserArgs, 'keyword'>>;
+  seeUser?: Resolver<Maybe<ResolversTypes['SeeUserResponse']>, ParentType, ContextType, RequireFields<QuerySeeUserArgs, 'page' | 'userName'>>;
   users?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType>;
+};
+
+export type SearchUserResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['SearchUserResponse'] = ResolversParentTypes['SearchUserResponse']> = {
+  error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  user?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type SeeUserResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['SeeUserResponse'] = ResolversParentTypes['SeeUserResponse']> = {
   error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  user?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type UnFollowerUserResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['UnFollowerUserResponse'] = ResolversParentTypes['UnFollowerUserResponse']> = {
+  error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  token?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -304,11 +381,17 @@ export type UserResolvers<ContextType = DataSourceContext, ParentType extends Re
   avatarURL?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   file?: Resolver<Maybe<ResolversTypes['Upload']>, ParentType, ContextType>;
+  followers?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType>;
+  following?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType>;
   githubUserName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  isFollowing?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  isMe?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   location?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   password?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  totalFollowers?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  totalFollowing?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   userName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -317,10 +400,13 @@ export type Resolvers<ContextType = DataSourceContext> = {
   CommonResponse?: CommonResponseResolvers<ContextType>;
   EditFileUploadResponse?: EditFileUploadResponseResolvers<ContextType>;
   File?: FileResolvers<ContextType>;
+  FollowerUserResponse?: FollowerUserResponseResolvers<ContextType>;
   LoginUserResponse?: LoginUserResponseResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  SearchUserResponse?: SearchUserResponseResolvers<ContextType>;
   SeeUserResponse?: SeeUserResponseResolvers<ContextType>;
+  UnFollowerUserResponse?: UnFollowerUserResponseResolvers<ContextType>;
   Upload?: GraphQLScalarType;
   User?: UserResolvers<ContextType>;
 };

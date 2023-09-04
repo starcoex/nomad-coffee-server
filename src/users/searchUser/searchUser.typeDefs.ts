@@ -2,9 +2,10 @@ import gql from "graphql-tag";
 
 export default gql`
   type Query {
-    seeUser(page: Int!, userName: String!): SeeUserResponse
+    searchUser(keyword: String!, page: Int): SearchUserResponse!
   }
-  type SeeUserResponse {
+
+  type SearchUserResponse {
     ok: Boolean!
     error: String
     user: [User]

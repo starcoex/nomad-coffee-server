@@ -17,6 +17,12 @@ export default gql`
     avatarURL: String
     file: Upload
     githubUserName: String
+    followers: [User]
+    following: [User]
+    totalFollowing: Int
+    totalFollowers: Int
+    isFollowing: Boolean
+    isMe: Boolean
   }
 
   # type File {
