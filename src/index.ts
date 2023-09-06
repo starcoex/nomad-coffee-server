@@ -10,6 +10,7 @@ import { ApolloServer } from "@apollo/server";
 import { typeDefs, resolvers } from "./schema";
 import { getUser } from "./util/users.utils";
 import morgan from "morgan";
+import prisma from "./prisma/client";
 
 const PORT = Number(process.env.PORT || 5000);
 const app = express();
@@ -37,6 +38,7 @@ async function startApolloServer() {
       context: async (ctx) => {
         return {
           dataSources: {
+            prisma: prisma,
             loggedInUser: await getUser(ctx.req.headers.authorization),
           },
         };

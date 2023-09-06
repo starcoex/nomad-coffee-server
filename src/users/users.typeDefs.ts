@@ -3,10 +3,6 @@ import gql from "graphql-tag";
 export default gql`
   scalar Upload
 
-  type Query {
-    users: [User]
-  }
-
   type User {
     id: Int!
     userName: String!
@@ -19,15 +15,12 @@ export default gql`
     githubUserName: String
     followers: [User]
     following: [User]
+    coffeeShops: [CoffeeShop]
+    totalShops: Int
     totalFollowing: Int
     totalFollowers: Int
     isFollowing: Boolean
-    isMe: Boolean
+    isMe: Boolean!
+    test: String
   }
-
-  # type File {
-  #   filename: String
-  #   mimetype: String
-  #   encoding: String
-  # }
 `;

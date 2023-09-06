@@ -1,8 +1,12 @@
-import { Resolvers } from "../generated/graphql";
 import prisma from "../prisma/client";
+import { Resolvers } from "../type";
 
 export const resolvers: Resolvers = {
   User: {
+    test: (parent) => {
+      console.log(parent);
+      return "test";
+    },
     totalFollowers: ({ userName }) => {
       return prisma.user.count({
         where: { followers: { some: { userName } } },
@@ -14,6 +18,7 @@ export const resolvers: Resolvers = {
       });
     },
     isMe: ({ id }, _, { dataSources }) => {
+      console.log(id);
       if (!dataSources.loggedInUser) {
         return false;
       }
@@ -36,6 +41,14 @@ export const resolvers: Resolvers = {
       // return user.length > 0;
       return Boolean(followingUser);
     },
+    totalShops: async (parent, _, { dataSources }) => {
+      console.log("Hooe ", parent);
+      return null;
+    },
+
+    // coffeeShops: ({ id }, _, { dataSources }) => {
+    //   return prisma.coffeeShop.findMany({ where: { user: { id } } });
+    // },
   },
 };
 

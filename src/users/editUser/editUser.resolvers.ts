@@ -1,9 +1,8 @@
 import { GraphQLUpload } from "graphql-upload-minimal";
-import { Resolvers } from "../../generated/graphql";
 import prisma from "../../prisma/client";
 import bcrypt from "bcrypt";
 import { createWriteStream } from "fs";
-import { Upload } from "../../types/upload";
+import { Resolvers } from "../../generated/graphql";
 
 const resolvers: Resolvers = {
   Upload: GraphQLUpload,

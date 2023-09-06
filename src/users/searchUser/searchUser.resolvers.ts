@@ -1,6 +1,6 @@
 import { error } from "console";
-import { Resolvers } from "../../generated/graphql";
 import prisma from "../../prisma/client";
+import { Resolvers } from "../../type";
 
 const resolvers: Resolvers = {
   Query: {

@@ -1,7 +1,7 @@
-import { Resolvers } from "../../generated/graphql";
 import prisma from "../../prisma/client";
 import bcrypt from "bcrypt";
 import Jwt from "jsonwebtoken";
+import { Resolvers } from "../../type";
 
 const resolvers: Resolvers = {
   Mutation: {

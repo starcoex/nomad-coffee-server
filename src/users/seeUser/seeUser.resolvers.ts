@@ -1,5 +1,5 @@
-import { Resolvers } from "../../generated/graphql";
 import prisma from "../../prisma/client";
+import { Resolvers } from "../../type";
 
 const resolvers: Resolvers = {
   Query: {
@@ -10,13 +10,14 @@ const resolvers: Resolvers = {
           include: {
             followers: true,
             following: true,
+            coffeeShops: true,
           },
           take: 25,
           skip: (page - 1) * 25,
         });
         return {
           ok: true,
-          user,
+          user: user,
         };
       } catch (e) {
         return {
