@@ -1,27 +1,33 @@
-import { Resolvers, Category } from "../generated/graphql";
+import { Resolvers } from "../generated/graphql";
 import prisma from "../prisma/client";
 
 const resolvers: Resolvers = {
   CoffeeShop: {
-    //@ts-ignore
+    user: async ({ id }, _, { dataSources }) => {
+      const user = await prisma.user.findUnique({
+        where: { id: dataSources.loggedInUser.id },
+      });
+      return user;
+    },
+    categories: async ({ id }, _, { dataSources }) => {
+      const categories = await prisma.category.findMany({
+        where: {
+          coffeeshops: { some: { userId: dataSources.loggedInUser.id } },
+        },
+      });
+      return categories as [];
+    },
     coffeeshopPhotos: async ({ id }, _, { dataSources }) => {
-      console.log("dafds");
-      return await prisma.coffeeShopPhoto.findMany({
+      const coffeeshopPhotos = await prisma.coffeeShopPhoto.findMany({
         where: {
           coffeeShop: { id },
         },
-        include: { coffeeShop: true },
       });
+      return coffeeshopPhotos as [];
     },
-    // categories: ({ id }, _, { dataSources }) => {
-    //   return prisma.coffeeShop.findMany({
-    //     include: { categories: true },
-    //   });
-    // },
   },
   Category: {
     totalShops: ({ id }, _, { dataSources }) => {
-      console.log("dasfda");
       return prisma.coffeeShop.count({
         where: { categories: { some: { id } } },
       });

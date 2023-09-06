@@ -7,10 +7,11 @@ const config: CodegenConfig = {
     "src/generated/graphql.ts": {
       plugins: ["typescript", "typescript-resolvers"],
       config: {
+        useIndexSignature: true,
         contextType: "../types/context#DataSourceContext",
-        // mappers: {
-        //   CoffeeShop: "../types/models#CoffeeShopModel",
-        // },
+        mappers: {
+          CoffeeShop: "../types/models#CoffeeShopModel",
+        },
         scalars: {
           Upload: GraphQLUpload,
         },

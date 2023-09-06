@@ -1,6 +1,6 @@
+import { Resolvers } from "../../generated/graphql";
 import prisma from "../../prisma/client";
 import bcrypt from "bcrypt";
-import { Resolvers } from "../../type";
 
 const resolvers: Resolvers = {
   Mutation: {
@@ -36,6 +36,7 @@ const resolvers: Resolvers = {
         return {
           ok: true,
           id: user.id,
+          user,
         };
       } catch (e) {
         return {

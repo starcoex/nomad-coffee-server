@@ -1,5 +1,5 @@
-import { Resolvers } from "../../generated/graphql";
 import prisma from "../../prisma/client";
+import { Resolvers } from "../../type";
 
 const resolvers: Resolvers = {
   Query: {
@@ -8,15 +8,10 @@ const resolvers: Resolvers = {
         const coffeeShop = await prisma.coffeeShop.findMany({
           take: 5,
           skip: (page - 1) * 5,
-          include: {
-            coffeeshopPhotos: {
-              select: { url: true },
-            },
-          },
         });
         return {
           ok: true,
-          coffeeShop: coffeeShop as [],
+          coffeeShop,
         };
       } catch (error) {
         return {

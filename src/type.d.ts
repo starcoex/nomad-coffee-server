@@ -1,7 +1,7 @@
 import { PrismaClient, User } from "@prisma/client";
-import prisma from "./prisma/client";
+import { GraphQLResolveInfo } from "graphql";
 
-type Context = {
+export type ContextType = {
   dataSources: {
     loggedInUser?: User;
     prisma: PrismaClient;
@@ -11,8 +11,8 @@ type Context = {
 export type Resolver = (
   root: any,
   args: any,
-  context: Context,
-  info: any
+  context: ContextType,
+  info: GraphQLResolveInfo
 ) => any;
 
 export type Resolvers = {
@@ -21,10 +21,7 @@ export type Resolvers = {
   };
 };
 
-export type SubResolvers = {
-  [key: string]: {
-    [key: string]: {
-      subscribe: Resolver;
-    };
-  };
+export type Pagination = {
+  lastId?: number;
+  offset?: number;
 };

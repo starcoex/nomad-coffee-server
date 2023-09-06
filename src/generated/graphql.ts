@@ -1,4 +1,5 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
+import { CoffeeShopModel } from '../types/models';
 import { DataSourceContext } from '../types/context';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -7,6 +8,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -31,7 +33,7 @@ export type Category = {
 
 export type CoffeeShop = {
   __typename?: 'CoffeeShop';
-  categories: Array<Category>;
+  categories?: Maybe<Array<Maybe<Category>>>;
   coffeeshopPhotos?: Maybe<Array<Maybe<CoffeeShopPhoto>>>;
   createdAt: Scalars['String']['output'];
   id?: Maybe<Scalars['Int']['output']>;
@@ -45,9 +47,9 @@ export type CoffeeShop = {
 export type CoffeeShopPhoto = {
   __typename?: 'CoffeeShopPhoto';
   coffeeShop: CoffeeShop;
-  createdAt?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['Int']['output']>;
-  updatedAt?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['String']['output'];
+  id: Scalars['Int']['output'];
+  updatedAt: Scalars['String']['output'];
   url?: Maybe<Scalars['String']['output']>;
 };
 
@@ -56,6 +58,13 @@ export type CommonResponse = {
   error?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['Int']['output']>;
   ok: Scalars['Boolean']['output'];
+};
+
+export type CreateUserResponse = {
+  __typename?: 'CreateUserResponse';
+  error?: Maybe<Scalars['String']['output']>;
+  ok: Scalars['Boolean']['output'];
+  user?: Maybe<User>;
 };
 
 export type EditFileUploadResponse = {
@@ -88,8 +97,8 @@ export type LoginUserResponse = {
 export type Mutation = {
   __typename?: 'Mutation';
   coffeeShopUplad: CommonResponse;
-  createCoffeeShop: CreateCoffeeShopResponse;
-  createUser: CommonResponse;
+  createCoffeeShop?: Maybe<CreateCoffeeShopResponse>;
+  createUser: CreateUserResponse;
   deleteFileUpload: CommonResponse;
   editCoffeeShop?: Maybe<EditCoffeeShopResponse>;
   editFileUpload: CommonResponse;
@@ -191,7 +200,7 @@ export type Query = {
   __typename?: 'Query';
   searchUser: SearchUserResponse;
   seeCategories?: Maybe<SeeCategoriesResponse>;
-  seeCoffeeShop: SeeCoffeeShopResponse;
+  seeCoffeeShop?: Maybe<SeeCoffeeShopResponse>;
   seeCoffeesShops?: Maybe<SeeCoffeesShopsResponse>;
   seeUser?: Maybe<SeeUserResponse>;
 };
@@ -210,7 +219,6 @@ export type QuerySeeCategoriesArgs = {
 
 export type QuerySeeCoffeeShopArgs = {
   id: Scalars['Int']['input'];
-  page?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -261,11 +269,10 @@ export type User = {
   githubUserName?: Maybe<Scalars['String']['output']>;
   id: Scalars['Int']['output'];
   isFollowing?: Maybe<Scalars['Boolean']['output']>;
-  isMe: Scalars['Boolean']['output'];
+  isMe?: Maybe<Scalars['Boolean']['output']>;
   location?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   password: Scalars['String']['output'];
-  test?: Maybe<Scalars['String']['output']>;
   totalFollowers?: Maybe<Scalars['Int']['output']>;
   totalFollowing?: Maybe<Scalars['Int']['output']>;
   totalShops?: Maybe<Scalars['Int']['output']>;
@@ -283,6 +290,7 @@ export type CreateCoffeeShopResponse = {
 export type EditCoffeeShopResponse = {
   __typename?: 'editCoffeeShopResponse';
   coffeeShop?: Maybe<CoffeeShop>;
+  coffeeshopPhotos?: Maybe<Array<Maybe<CoffeeShopPhoto>>>;
   error?: Maybe<Scalars['String']['output']>;
   ok: Scalars['Boolean']['output'];
 };
@@ -296,7 +304,8 @@ export type SeeCategoriesResponse = {
 
 export type SeeCoffeeShopResponse = {
   __typename?: 'seeCoffeeShopResponse';
-  coffeeShop?: Maybe<CoffeeShop>;
+  coffeeShop: CoffeeShop;
+  coffeeShopPhoto?: Maybe<CoffeeShopPhoto>;
   error?: Maybe<Scalars['String']['output']>;
   ok: Scalars['Boolean']['output'];
 };
@@ -308,7 +317,8 @@ export type SeeCoffeesShopsResponse = {
   ok: Scalars['Boolean']['output'];
 };
 
-
+export type WithIndex<TObject> = TObject & Record<string, any>;
+export type ResolversObject<TObject> = WithIndex<TObject>;
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
 
@@ -378,12 +388,13 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 
 /** Mapping between all available schema types and the resolvers types */
-export type ResolversTypes = {
+export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
-  Category: ResolverTypeWrapper<Category>;
-  CoffeeShop: ResolverTypeWrapper<CoffeeShop>;
-  CoffeeShopPhoto: ResolverTypeWrapper<CoffeeShopPhoto>;
+  Category: ResolverTypeWrapper<Omit<Category, 'coffeeshops'> & { coffeeshops?: Maybe<Array<Maybe<ResolversTypes['CoffeeShop']>>> }>;
+  CoffeeShop: ResolverTypeWrapper<CoffeeShopModel>;
+  CoffeeShopPhoto: ResolverTypeWrapper<Omit<CoffeeShopPhoto, 'coffeeShop'> & { coffeeShop: ResolversTypes['CoffeeShop'] }>;
   CommonResponse: ResolverTypeWrapper<CommonResponse>;
+  CreateUserResponse: ResolverTypeWrapper<Omit<CreateUserResponse, 'user'> & { user?: Maybe<ResolversTypes['User']> }>;
   EditFileUploadResponse: ResolverTypeWrapper<EditFileUploadResponse>;
   File: ResolverTypeWrapper<File>;
   FollowerUserResponse: ResolverTypeWrapper<FollowerUserResponse>;
@@ -391,27 +402,28 @@ export type ResolversTypes = {
   LoginUserResponse: ResolverTypeWrapper<LoginUserResponse>;
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
-  SearchUserResponse: ResolverTypeWrapper<SearchUserResponse>;
-  SeeUserResponse: ResolverTypeWrapper<SeeUserResponse>;
+  SearchUserResponse: ResolverTypeWrapper<Omit<SearchUserResponse, 'user'> & { user?: Maybe<Array<Maybe<ResolversTypes['User']>>> }>;
+  SeeUserResponse: ResolverTypeWrapper<Omit<SeeUserResponse, 'user'> & { user?: Maybe<Array<Maybe<ResolversTypes['User']>>> }>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   UnFollowerUserResponse: ResolverTypeWrapper<UnFollowerUserResponse>;
   Upload: ResolverTypeWrapper<Scalars['Upload']['output']>;
   UploadFile: UploadFile;
-  User: ResolverTypeWrapper<User>;
-  createCoffeeShopResponse: ResolverTypeWrapper<CreateCoffeeShopResponse>;
-  editCoffeeShopResponse: ResolverTypeWrapper<EditCoffeeShopResponse>;
-  seeCategoriesResponse: ResolverTypeWrapper<SeeCategoriesResponse>;
-  seeCoffeeShopResponse: ResolverTypeWrapper<SeeCoffeeShopResponse>;
-  seeCoffeesShopsResponse: ResolverTypeWrapper<SeeCoffeesShopsResponse>;
-};
+  User: ResolverTypeWrapper<Omit<User, 'coffeeShops' | 'followers' | 'following'> & { coffeeShops?: Maybe<Array<Maybe<ResolversTypes['CoffeeShop']>>>, followers?: Maybe<Array<Maybe<ResolversTypes['User']>>>, following?: Maybe<Array<Maybe<ResolversTypes['User']>>> }>;
+  createCoffeeShopResponse: ResolverTypeWrapper<Omit<CreateCoffeeShopResponse, 'coffeeShop' | 'coffeeshopPhotos'> & { coffeeShop?: Maybe<ResolversTypes['CoffeeShop']>, coffeeshopPhotos?: Maybe<Array<Maybe<ResolversTypes['CoffeeShopPhoto']>>> }>;
+  editCoffeeShopResponse: ResolverTypeWrapper<Omit<EditCoffeeShopResponse, 'coffeeShop' | 'coffeeshopPhotos'> & { coffeeShop?: Maybe<ResolversTypes['CoffeeShop']>, coffeeshopPhotos?: Maybe<Array<Maybe<ResolversTypes['CoffeeShopPhoto']>>> }>;
+  seeCategoriesResponse: ResolverTypeWrapper<Omit<SeeCategoriesResponse, 'category'> & { category?: Maybe<Array<Maybe<ResolversTypes['Category']>>> }>;
+  seeCoffeeShopResponse: ResolverTypeWrapper<Omit<SeeCoffeeShopResponse, 'coffeeShop' | 'coffeeShopPhoto'> & { coffeeShop: ResolversTypes['CoffeeShop'], coffeeShopPhoto?: Maybe<ResolversTypes['CoffeeShopPhoto']> }>;
+  seeCoffeesShopsResponse: ResolverTypeWrapper<Omit<SeeCoffeesShopsResponse, 'coffeeShop'> & { coffeeShop?: Maybe<Array<Maybe<ResolversTypes['CoffeeShop']>>> }>;
+}>;
 
 /** Mapping between all available schema types and the resolvers parents */
-export type ResolversParentTypes = {
+export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']['output'];
-  Category: Category;
-  CoffeeShop: CoffeeShop;
-  CoffeeShopPhoto: CoffeeShopPhoto;
+  Category: Omit<Category, 'coffeeshops'> & { coffeeshops?: Maybe<Array<Maybe<ResolversParentTypes['CoffeeShop']>>> };
+  CoffeeShop: CoffeeShopModel;
+  CoffeeShopPhoto: Omit<CoffeeShopPhoto, 'coffeeShop'> & { coffeeShop: ResolversParentTypes['CoffeeShop'] };
   CommonResponse: CommonResponse;
+  CreateUserResponse: Omit<CreateUserResponse, 'user'> & { user?: Maybe<ResolversParentTypes['User']> };
   EditFileUploadResponse: EditFileUploadResponse;
   File: File;
   FollowerUserResponse: FollowerUserResponse;
@@ -419,21 +431,21 @@ export type ResolversParentTypes = {
   LoginUserResponse: LoginUserResponse;
   Mutation: {};
   Query: {};
-  SearchUserResponse: SearchUserResponse;
-  SeeUserResponse: SeeUserResponse;
+  SearchUserResponse: Omit<SearchUserResponse, 'user'> & { user?: Maybe<Array<Maybe<ResolversParentTypes['User']>>> };
+  SeeUserResponse: Omit<SeeUserResponse, 'user'> & { user?: Maybe<Array<Maybe<ResolversParentTypes['User']>>> };
   String: Scalars['String']['output'];
   UnFollowerUserResponse: UnFollowerUserResponse;
   Upload: Scalars['Upload']['output'];
   UploadFile: UploadFile;
-  User: User;
-  createCoffeeShopResponse: CreateCoffeeShopResponse;
-  editCoffeeShopResponse: EditCoffeeShopResponse;
-  seeCategoriesResponse: SeeCategoriesResponse;
-  seeCoffeeShopResponse: SeeCoffeeShopResponse;
-  seeCoffeesShopsResponse: SeeCoffeesShopsResponse;
-};
+  User: Omit<User, 'coffeeShops' | 'followers' | 'following'> & { coffeeShops?: Maybe<Array<Maybe<ResolversParentTypes['CoffeeShop']>>>, followers?: Maybe<Array<Maybe<ResolversParentTypes['User']>>>, following?: Maybe<Array<Maybe<ResolversParentTypes['User']>>> };
+  createCoffeeShopResponse: Omit<CreateCoffeeShopResponse, 'coffeeShop' | 'coffeeshopPhotos'> & { coffeeShop?: Maybe<ResolversParentTypes['CoffeeShop']>, coffeeshopPhotos?: Maybe<Array<Maybe<ResolversParentTypes['CoffeeShopPhoto']>>> };
+  editCoffeeShopResponse: Omit<EditCoffeeShopResponse, 'coffeeShop' | 'coffeeshopPhotos'> & { coffeeShop?: Maybe<ResolversParentTypes['CoffeeShop']>, coffeeshopPhotos?: Maybe<Array<Maybe<ResolversParentTypes['CoffeeShopPhoto']>>> };
+  seeCategoriesResponse: Omit<SeeCategoriesResponse, 'category'> & { category?: Maybe<Array<Maybe<ResolversParentTypes['Category']>>> };
+  seeCoffeeShopResponse: Omit<SeeCoffeeShopResponse, 'coffeeShop' | 'coffeeShopPhoto'> & { coffeeShop: ResolversParentTypes['CoffeeShop'], coffeeShopPhoto?: Maybe<ResolversParentTypes['CoffeeShopPhoto']> };
+  seeCoffeesShopsResponse: Omit<SeeCoffeesShopsResponse, 'coffeeShop'> & { coffeeShop?: Maybe<Array<Maybe<ResolversParentTypes['CoffeeShop']>>> };
+}>;
 
-export type CategoryResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['Category'] = ResolversParentTypes['Category']> = {
+export type CategoryResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['Category'] = ResolversParentTypes['Category']> = ResolversObject<{
   coffeeshops?: Resolver<Maybe<Array<Maybe<ResolversTypes['CoffeeShop']>>>, ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -442,10 +454,10 @@ export type CategoryResolvers<ContextType = DataSourceContext, ParentType extend
   totalShops?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
-export type CoffeeShopResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['CoffeeShop'] = ResolversParentTypes['CoffeeShop']> = {
-  categories?: Resolver<Array<ResolversTypes['Category']>, ParentType, ContextType>;
+export type CoffeeShopResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['CoffeeShop'] = ResolversParentTypes['CoffeeShop']> = ResolversObject<{
+  categories?: Resolver<Maybe<Array<Maybe<ResolversTypes['Category']>>>, ParentType, ContextType>;
   coffeeshopPhotos?: Resolver<Maybe<Array<Maybe<ResolversTypes['CoffeeShopPhoto']>>>, ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
@@ -455,55 +467,62 @@ export type CoffeeShopResolvers<ContextType = DataSourceContext, ParentType exte
   updatedAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
-export type CoffeeShopPhotoResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['CoffeeShopPhoto'] = ResolversParentTypes['CoffeeShopPhoto']> = {
+export type CoffeeShopPhotoResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['CoffeeShopPhoto'] = ResolversParentTypes['CoffeeShopPhoto']> = ResolversObject<{
   coffeeShop?: Resolver<ResolversTypes['CoffeeShop'], ParentType, ContextType>;
-  createdAt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  updatedAt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
-export type CommonResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['CommonResponse'] = ResolversParentTypes['CommonResponse']> = {
+export type CommonResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['CommonResponse'] = ResolversParentTypes['CommonResponse']> = ResolversObject<{
   error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
-export type EditFileUploadResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['EditFileUploadResponse'] = ResolversParentTypes['EditFileUploadResponse']> = {
+export type CreateUserResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['CreateUserResponse'] = ResolversParentTypes['CreateUserResponse']> = ResolversObject<{
+  error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type EditFileUploadResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['EditFileUploadResponse'] = ResolversParentTypes['EditFileUploadResponse']> = ResolversObject<{
   error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   file?: Resolver<Maybe<ResolversTypes['File']>, ParentType, ContextType>;
   ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
-export type FileResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['File'] = ResolversParentTypes['File']> = {
+export type FileResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['File'] = ResolversParentTypes['File']> = ResolversObject<{
   fileUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
-export type FollowerUserResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['FollowerUserResponse'] = ResolversParentTypes['FollowerUserResponse']> = {
+export type FollowerUserResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['FollowerUserResponse'] = ResolversParentTypes['FollowerUserResponse']> = ResolversObject<{
   error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   token?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
-export type LoginUserResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['LoginUserResponse'] = ResolversParentTypes['LoginUserResponse']> = {
+export type LoginUserResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['LoginUserResponse'] = ResolversParentTypes['LoginUserResponse']> = ResolversObject<{
   error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   token?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
-export type MutationResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+export type MutationResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   coffeeShopUplad?: Resolver<ResolversTypes['CommonResponse'], ParentType, ContextType, Partial<MutationCoffeeShopUpladArgs>>;
-  createCoffeeShop?: Resolver<ResolversTypes['createCoffeeShopResponse'], ParentType, ContextType, Partial<MutationCreateCoffeeShopArgs>>;
-  createUser?: Resolver<ResolversTypes['CommonResponse'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'email' | 'name' | 'password' | 'userName'>>;
+  createCoffeeShop?: Resolver<Maybe<ResolversTypes['createCoffeeShopResponse']>, ParentType, ContextType, Partial<MutationCreateCoffeeShopArgs>>;
+  createUser?: Resolver<ResolversTypes['CreateUserResponse'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'email' | 'name' | 'password' | 'userName'>>;
   deleteFileUpload?: Resolver<ResolversTypes['CommonResponse'], ParentType, ContextType, RequireFields<MutationDeleteFileUploadArgs, 'id'>>;
   editCoffeeShop?: Resolver<Maybe<ResolversTypes['editCoffeeShopResponse']>, ParentType, ContextType, RequireFields<MutationEditCoffeeShopArgs, 'id'>>;
   editFileUpload?: Resolver<ResolversTypes['CommonResponse'], ParentType, ContextType, RequireFields<MutationEditFileUploadArgs, 'id'>>;
@@ -513,42 +532,42 @@ export type MutationResolvers<ContextType = DataSourceContext, ParentType extend
   multipleFileUpload?: Resolver<Maybe<ResolversTypes['File']>, ParentType, ContextType, Partial<MutationMultipleFileUploadArgs>>;
   singleFileUpload?: Resolver<ResolversTypes['CommonResponse'], ParentType, ContextType, RequireFields<MutationSingleFileUploadArgs, 'id'>>;
   unFollowerUser?: Resolver<Maybe<ResolversTypes['UnFollowerUserResponse']>, ParentType, ContextType, Partial<MutationUnFollowerUserArgs>>;
-};
+}>;
 
-export type QueryResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+export type QueryResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   searchUser?: Resolver<ResolversTypes['SearchUserResponse'], ParentType, ContextType, RequireFields<QuerySearchUserArgs, 'keyword'>>;
   seeCategories?: Resolver<Maybe<ResolversTypes['seeCategoriesResponse']>, ParentType, ContextType, Partial<QuerySeeCategoriesArgs>>;
-  seeCoffeeShop?: Resolver<ResolversTypes['seeCoffeeShopResponse'], ParentType, ContextType, RequireFields<QuerySeeCoffeeShopArgs, 'id'>>;
+  seeCoffeeShop?: Resolver<Maybe<ResolversTypes['seeCoffeeShopResponse']>, ParentType, ContextType, RequireFields<QuerySeeCoffeeShopArgs, 'id'>>;
   seeCoffeesShops?: Resolver<Maybe<ResolversTypes['seeCoffeesShopsResponse']>, ParentType, ContextType, Partial<QuerySeeCoffeesShopsArgs>>;
   seeUser?: Resolver<Maybe<ResolversTypes['SeeUserResponse']>, ParentType, ContextType, RequireFields<QuerySeeUserArgs, 'page' | 'userName'>>;
-};
+}>;
 
-export type SearchUserResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['SearchUserResponse'] = ResolversParentTypes['SearchUserResponse']> = {
+export type SearchUserResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['SearchUserResponse'] = ResolversParentTypes['SearchUserResponse']> = ResolversObject<{
   error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   user?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
-export type SeeUserResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['SeeUserResponse'] = ResolversParentTypes['SeeUserResponse']> = {
+export type SeeUserResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['SeeUserResponse'] = ResolversParentTypes['SeeUserResponse']> = ResolversObject<{
   error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   user?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
-export type UnFollowerUserResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['UnFollowerUserResponse'] = ResolversParentTypes['UnFollowerUserResponse']> = {
+export type UnFollowerUserResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['UnFollowerUserResponse'] = ResolversParentTypes['UnFollowerUserResponse']> = ResolversObject<{
   error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   token?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
 export interface UploadScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Upload'], any> {
   name: 'Upload';
 }
 
-export type UserResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
+export type UserResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   avatarURL?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   coffeeShops?: Resolver<Maybe<Array<Maybe<ResolversTypes['CoffeeShop']>>>, ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -558,59 +577,61 @@ export type UserResolvers<ContextType = DataSourceContext, ParentType extends Re
   githubUserName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   isFollowing?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
-  isMe?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  isMe?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   location?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   password?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  test?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   totalFollowers?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   totalFollowing?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   totalShops?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   userName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
-export type CreateCoffeeShopResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['createCoffeeShopResponse'] = ResolversParentTypes['createCoffeeShopResponse']> = {
+export type CreateCoffeeShopResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['createCoffeeShopResponse'] = ResolversParentTypes['createCoffeeShopResponse']> = ResolversObject<{
   coffeeShop?: Resolver<Maybe<ResolversTypes['CoffeeShop']>, ParentType, ContextType>;
   coffeeshopPhotos?: Resolver<Maybe<Array<Maybe<ResolversTypes['CoffeeShopPhoto']>>>, ParentType, ContextType>;
   error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
-export type EditCoffeeShopResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['editCoffeeShopResponse'] = ResolversParentTypes['editCoffeeShopResponse']> = {
+export type EditCoffeeShopResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['editCoffeeShopResponse'] = ResolversParentTypes['editCoffeeShopResponse']> = ResolversObject<{
   coffeeShop?: Resolver<Maybe<ResolversTypes['CoffeeShop']>, ParentType, ContextType>;
+  coffeeshopPhotos?: Resolver<Maybe<Array<Maybe<ResolversTypes['CoffeeShopPhoto']>>>, ParentType, ContextType>;
   error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
-export type SeeCategoriesResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['seeCategoriesResponse'] = ResolversParentTypes['seeCategoriesResponse']> = {
+export type SeeCategoriesResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['seeCategoriesResponse'] = ResolversParentTypes['seeCategoriesResponse']> = ResolversObject<{
   category?: Resolver<Maybe<Array<Maybe<ResolversTypes['Category']>>>, ParentType, ContextType>;
   error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
-export type SeeCoffeeShopResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['seeCoffeeShopResponse'] = ResolversParentTypes['seeCoffeeShopResponse']> = {
-  coffeeShop?: Resolver<Maybe<ResolversTypes['CoffeeShop']>, ParentType, ContextType>;
+export type SeeCoffeeShopResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['seeCoffeeShopResponse'] = ResolversParentTypes['seeCoffeeShopResponse']> = ResolversObject<{
+  coffeeShop?: Resolver<ResolversTypes['CoffeeShop'], ParentType, ContextType>;
+  coffeeShopPhoto?: Resolver<Maybe<ResolversTypes['CoffeeShopPhoto']>, ParentType, ContextType>;
   error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
-export type SeeCoffeesShopsResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['seeCoffeesShopsResponse'] = ResolversParentTypes['seeCoffeesShopsResponse']> = {
+export type SeeCoffeesShopsResponseResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['seeCoffeesShopsResponse'] = ResolversParentTypes['seeCoffeesShopsResponse']> = ResolversObject<{
   coffeeShop?: Resolver<Maybe<Array<Maybe<ResolversTypes['CoffeeShop']>>>, ParentType, ContextType>;
   error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
-export type Resolvers<ContextType = DataSourceContext> = {
+export type Resolvers<ContextType = DataSourceContext> = ResolversObject<{
   Category?: CategoryResolvers<ContextType>;
   CoffeeShop?: CoffeeShopResolvers<ContextType>;
   CoffeeShopPhoto?: CoffeeShopPhotoResolvers<ContextType>;
   CommonResponse?: CommonResponseResolvers<ContextType>;
+  CreateUserResponse?: CreateUserResponseResolvers<ContextType>;
   EditFileUploadResponse?: EditFileUploadResponseResolvers<ContextType>;
   File?: FileResolvers<ContextType>;
   FollowerUserResponse?: FollowerUserResponseResolvers<ContextType>;
@@ -627,5 +648,5 @@ export type Resolvers<ContextType = DataSourceContext> = {
   seeCategoriesResponse?: SeeCategoriesResponseResolvers<ContextType>;
   seeCoffeeShopResponse?: SeeCoffeeShopResponseResolvers<ContextType>;
   seeCoffeesShopsResponse?: SeeCoffeesShopsResponseResolvers<ContextType>;
-};
+}>;
 

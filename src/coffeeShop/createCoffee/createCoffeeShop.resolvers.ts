@@ -1,4 +1,4 @@
-import { Category, Resolvers } from "../../generated/graphql";
+import { Resolvers } from "../../generated/graphql";
 import prisma from "../../prisma/client";
 
 const resolvers: Resolvers = {

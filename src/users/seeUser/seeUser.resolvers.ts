@@ -10,7 +10,6 @@ const resolvers: Resolvers = {
           include: {
             followers: true,
             following: true,
-            coffeeShops: true,
           },
           take: 25,
           skip: (page - 1) * 25,

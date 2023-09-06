@@ -10,6 +10,12 @@ export default gql`
       password: String!
       avatarURL: String
       githubUserName: String
-    ): CommonResponse!
+    ): CreateUserResponse!
+  }
+
+  type CreateUserResponse {
+    ok: Boolean!
+    error: String
+    user: User
   }
 `;

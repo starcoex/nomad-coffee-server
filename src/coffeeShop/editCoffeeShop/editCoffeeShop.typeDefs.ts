@@ -14,6 +14,6 @@ export default gql`
     ok: Boolean!
     error: String
     coffeeShop: CoffeeShop
-    # coffeeshopPhotos: [CoffeeShopPhoto]
+    coffeeshopPhotos: [CoffeeShopPhoto]
   }
 `;

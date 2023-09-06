@@ -1,16 +1,12 @@
-import { Resolvers } from "../../generated/graphql";
 import prisma from "../../prisma/client";
+import { Resolvers } from "../../type";
 
 const resolvers: Resolvers = {
   Query: {
-    //@ts-ignore
-    seeCoffeeShop: async (_, { id, page }) => {
+    seeCoffeeShop: async (_, { id }) => {
       try {
         const coffeeShop = await prisma.coffeeShop.findUnique({
           where: { id },
-          // include: { coffeeshopPhotos: true },
-          // take: 5,
-          // skip: (page - 1) * 5,
         });
         return {
           ok: true,

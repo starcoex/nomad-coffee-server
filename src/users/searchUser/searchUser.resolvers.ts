@@ -1,4 +1,3 @@
-import { error } from "console";
 import prisma from "../../prisma/client";
 import { Resolvers } from "../../type";
 

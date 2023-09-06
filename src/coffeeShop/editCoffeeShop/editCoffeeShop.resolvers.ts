@@ -3,7 +3,6 @@ import prisma from "../../prisma/client";
 
 const resolvers: Resolvers = {
   Mutation: {
-    //@ts-ignore
     editCoffeeShop: async (
       _,
       { id, name, latitude, longitude, categories },
@@ -42,7 +41,6 @@ const resolvers: Resolvers = {
           where: {
             id,
           },
-          include: { user: true, categories: true },
           data: {
             name,
             latitude,
@@ -55,7 +53,6 @@ const resolvers: Resolvers = {
             }),
           },
         });
-        console.log(updateCoffeeShop);
         return {
           ok: true,
           coffeeShop: updateCoffeeShop,

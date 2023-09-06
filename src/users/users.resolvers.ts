@@ -1,24 +1,21 @@
+import { Resolvers } from "../generated/graphql";
 import prisma from "../prisma/client";
-import { Resolvers } from "../type";
 
-export const resolvers: Resolvers = {
+const resolvers: Resolvers = {
   User: {
-    test: (parent) => {
-      console.log(parent);
-      return "test";
-    },
-    totalFollowers: ({ userName }) => {
-      return prisma.user.count({
+    totalFollowers: async ({ userName }, _, { dataSources }) => {
+      const totalFollowers = await prisma.user.count({
         where: { followers: { some: { userName } } },
       });
+      return totalFollowers;
     },
-    totalFollowing: ({ userName }) => {
-      return prisma.user.count({
+    totalFollowing: async ({ userName }, _, { dataSources }) => {
+      const totalFollowing = await prisma.user.count({
         where: { following: { some: { userName } } },
       });
+      return totalFollowing;
     },
     isMe: ({ id }, _, { dataSources }) => {
-      console.log(id);
       if (!dataSources.loggedInUser) {
         return false;
       }
@@ -38,17 +35,22 @@ export const resolvers: Resolvers = {
           following: { some: { id } },
         },
       });
-      // return user.length > 0;
       return Boolean(followingUser);
     },
-    totalShops: async (parent, _, { dataSources }) => {
-      console.log("Hooe ", parent);
-      return null;
+    totalShops: async ({ id }, _, { dataSources }) => {
+      const totalShops = await prisma.coffeeShop.count({
+        where: { userId: id },
+      });
+      return totalShops;
     },
-
-    // coffeeShops: ({ id }, _, { dataSources }) => {
-    //   return prisma.coffeeShop.findMany({ where: { user: { id } } });
-    // },
+    coffeeShops: async ({ id }, _, { dataSources }) => {
+      const coffeeShops = await prisma.user
+        .findUnique({
+          where: { id },
+        })
+        .coffeeShops();
+      return coffeeShops as [];
+    },
   },
 };
 

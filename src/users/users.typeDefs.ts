@@ -20,7 +20,6 @@ export default gql`
     totalFollowing: Int
     totalFollowers: Int
     isFollowing: Boolean
-    isMe: Boolean!
-    test: String
+    isMe: Boolean
   }
 `;
