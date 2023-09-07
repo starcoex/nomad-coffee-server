@@ -16,11 +16,12 @@
   "dependencies": {
     "@apollo/server": "^4.9.2",
     "@prisma/client": "^5.2.0",
+    "@types/ftp": "^0.3.33",
     "@types/morgan": "^1.9.5",
     "apollo-server-express": "^3.12.1",
     "aws-sdk": "^2.1452.0",
+    "basic-ftp": "^5.0.3",
     "bcrypt": "^5.1.1",
-    "ftp-ts": "^1.1.0",
     "graphql": "^16.8.0",
     "graphql-tag": "^2.12.6",
     "jsonwebtoken": "^9.0.2",
