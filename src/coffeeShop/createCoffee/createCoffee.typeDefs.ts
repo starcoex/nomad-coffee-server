@@ -7,13 +7,13 @@ export default gql`
       latitude: String
       longitude: String
       categories: [String]
+      file: Upload
     ): createCoffeeShopResponse
   }
 
   type createCoffeeShopResponse {
     ok: Boolean!
     error: String
-    coffeeShop: CoffeeShop
-    coffeeshopPhotos: [CoffeeShopPhoto]
+    # coffeeShop: CoffeeShop
   }
 `;

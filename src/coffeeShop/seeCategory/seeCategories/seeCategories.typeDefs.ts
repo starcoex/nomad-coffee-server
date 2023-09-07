@@ -8,6 +8,6 @@ export default gql`
   type seeCategoriesResponse {
     ok: Boolean!
     error: String
-    category: [Category]
+    coffeeshops: [CoffeeShop]
   }
 `;

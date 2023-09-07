@@ -9,9 +9,9 @@ const config: CodegenConfig = {
       config: {
         useIndexSignature: true,
         contextType: "../types/context#DataSourceContext",
-        mappers: {
-          CoffeeShop: "../types/models#CoffeeShopModel",
-        },
+        // mappers: {
+        //   CoffeeShop: "../types/models#CoffeeShopModel",
+        // },
         scalars: {
           Upload: GraphQLUpload,
         },

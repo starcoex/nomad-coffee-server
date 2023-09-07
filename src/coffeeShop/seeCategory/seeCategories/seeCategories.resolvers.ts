@@ -1,23 +1,23 @@
-import { Resolvers } from "../../generated/graphql";
-import prisma from "../../prisma/client";
+import { Resolvers } from "../../../generated/graphql";
+import prisma from "../../../prisma/client";
 
 const resolvers: Resolvers = {
   Query: {
-    seeCategories: async (_, { lastId }) => {
+    seeCategories: async (_, { lastId }, { dataSources }) => {
       try {
-        const category = await prisma.category.findMany({
+        const categories = await prisma.category.findMany({
           take: 5,
           skip: lastId ? 1 : 0,
           ...(lastId && { cursor: { id: lastId } }),
         });
         return {
           ok: true,
-          category: category as [],
+          coffeeshops: categories as [],
         };
-      } catch (error) {
+      } catch (e) {
         return {
           ok: false,
-          error: "CoffeeShop not found.",
+          error: e.message,
         };
       }
     },

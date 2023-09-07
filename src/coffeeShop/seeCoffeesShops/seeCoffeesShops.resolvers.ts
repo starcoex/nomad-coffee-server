@@ -3,11 +3,12 @@ import { Resolvers } from "../../type";
 
 const resolvers: Resolvers = {
   Query: {
-    seeCoffeesShops: async (_, { page }) => {
+    seeCoffeesShops: async (_, { lastId }) => {
       try {
         const coffeeShop = await prisma.coffeeShop.findMany({
           take: 5,
-          skip: (page - 1) * 5,
+          skip: lastId ? 1 : 0,
+          ...(lastId && { cursor: { id: lastId } }),
         });
         return {
           ok: true,

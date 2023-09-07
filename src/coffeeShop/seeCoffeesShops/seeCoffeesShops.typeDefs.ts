@@ -2,7 +2,7 @@ import gql from "graphql-tag";
 
 export default gql`
   type Query {
-    seeCoffeesShops(page: Int): seeCoffeesShopsResponse
+    seeCoffeesShops(lastId: Int): seeCoffeesShopsResponse
   }
 
   type seeCoffeesShopsResponse {
