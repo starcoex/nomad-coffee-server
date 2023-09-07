@@ -1,4 +1,5 @@
 import * as ftp from "basic-ftp";
+import * as fs from "fs";
 
 const HOST = process.env.STARCOEX_FTP_UBUNTU_HOST;
 const USER = process.env.STARCOEX_FTP_UBUNTU_USERNAME;
@@ -16,6 +17,7 @@ export const starFtp = async () => {
       port: 21,
     });
     console.log(await client.list());
+    await client.cd(process.env.DEFAULT_FOLDER);
     await client.uploadFrom("README.md", "README_FTP.md");
     await client.downloadTo("README_COPY.md", "README_FTP.md");
     return ftp;
